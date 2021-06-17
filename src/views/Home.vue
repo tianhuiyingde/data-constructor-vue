@@ -13,11 +13,14 @@
     </a-button>
   </div>
 
-  <div class="components-update" v-if="stepStatus == 1">
+  <div class="components-update" v-if="stepStatus == 1" data-sourse="game">
     <div style="color: red;font-size: 20px;margin-top: 10px;">请进入以下地址编辑互动题内容并保存。</div>
     <a class="target" target="_blank" href="https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95">
       https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95</a> 
-  </div>
+      <router-link :to="'/doc?ebookId=' + item.id">
+        {{ game }}
+      </router-link>
+    </div>
 
   <div class="components-publish" v-if="stepStatus == 2">
     <a-select :size="large"  style="width: 150px;margin-right: 20px;" placeholder="请选择学段" @change="handleChange" >
@@ -84,7 +87,6 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      created();
       tipsHandler();
     });
 
@@ -117,6 +119,7 @@ export default defineComponent({
     };
 
     const nextStep = (ids: any) => {
+      created();
       console.log(ids, '--ids--');
       data.stepStatus = ids;
       tipsHandler();
