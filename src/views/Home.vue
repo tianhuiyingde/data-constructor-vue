@@ -13,13 +13,11 @@
     </a-button>
   </div>
 
-  <div class="components-update" v-if="stepStatus == 1" data-sourse="game">
+  <div class="components-update" v-if="stepStatus == 1" :data-sourse="data">
     <div style="color: red;font-size: 20px;margin-top: 10px;">请进入以下地址编辑互动题内容并保存。</div>
-    <a class="target" target="_blank" href="{{editorUrl}}">
-      https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95</a> 
-      <router-link :to="'/doc?ebookId=' + item.id">
-        {{ game }}
-      </router-link>
+    <a class="target" target="_blank" href={{data.editorUrl}}>
+      {{editorUrl}}</a> 
+
     </div>
 
   <div class="components-publish" v-if="stepStatus == 2">
@@ -93,13 +91,12 @@ export default defineComponent({
 
     const created = (): void => {
       let iname = {"name" :"t33336553"};
-      let categorys;
       axios.post(process.env.VUE_APP_SERVER + "/game/create",iname).then((res: any) => {
         let data = res.data;
+        console.log("data",data);
         if (data.success) {
-          categorys = data.content;
-          console.log("原始数据：", categorys);
-          data.editorUrl = categorys.editorUrl
+          data.editorUrl = data.data.editorUrl;
+          console.log("editorUrl",data.editorUrl);
         }
       })
     };
