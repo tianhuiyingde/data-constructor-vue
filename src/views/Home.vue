@@ -1,18 +1,148 @@
 <template>
+
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <a-steps type="navigation" :style="stepStyle" >
+      <a-step v-for="(item, index) in stepList" :key = "index" :status="item.status" :title="item.title" :description="item.description"/>
+    </a-steps>
+  </div>
+
+  <div class="components-create" style ='opacity: 100'>
+    <a-input class="components-input" maxLength = 10 size="large" placeholder="请输入互动题名称" allow-clear @change="onChange" />
+    <a-button type="primary" :size="size">
+      创建
+    </a-button>
+  </div>
+
+  <div class="components-update" style ='opacity: 0'>
+    <div style="color: red;font-size: 20px;margin-top: 10px;">请进入以下地址编辑互动题内容并保存。</div>
+    <a class="target" target="_blank" href="https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95">
+      https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95</a> 
+  </div>
+
+  <div class="components-publish" style ='opacity: 0'>
+  <a-select :size="large"  style="width: 150px;margin-right: 20px;" placeholder="请选择学段" @change="handleChange" >
+    <a-select-option value="1">
+      小学
+    </a-select-option>
+    <a-select-option value="2">
+      初中
+    </a-select-option>
+    <a-select-option value="3" >
+      高中
+    </a-select-option>
+  </a-select>
+
+  <a-select :size="large"  style="width: 150px;margin-right: 50px;" placeholder="请选择学科" @change="handleChange" >
+    <a-select-option value="1">
+      语文
+    </a-select-option>
+    <a-select-option value="2">
+      英语
+    </a-select-option>
+    <a-select-option value="3" >
+      数学
+    </a-select-option>
+  </a-select>
+
+  <a-button type="primary" :size="size">
+    发布
+  </a-button>
+</div>
+  <div id='components-next' style ='opacity: 0'>
+    <a-button-group>
+      <a-button type="primary"> 下一步<a-icon type="right" /> </a-button>
+    </a-button-group>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import { defineComponent, onMounted } from 'vue';
+import axios from "axios";
+// import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
 export default defineComponent({
   name: 'Home',
   components: {
-    HelloWorld,
+    // HelloWorld,
   },
+  data() {
+    return {
+      stepStatus: 0,
+      stepStyle: {
+        marginBottom: '60px',
+        boxShadow: '0px -1px 0 0 #e8e8e8 inset',
+      },
+      stepList: [
+        {status: 'process', title: 'Step 1',description: '创建互动题'},
+        {status: 'wait', title: 'Step 2',description: '编辑互动题'},
+        {status: 'wait', title: 'Step 3',description: '发布'},
+      ]
+    };
+  },
+
+
+  setup() {
+    console.log("setup");
+    onMounted(() => {
+    //   let { stepList, stepStatus } = this.data;
+    //   for(let index = 0; index < stepList.length -1; index ++) {
+    //   if(index < stepStatus) {
+    //     stepList[index].status = 'finish';
+    //   } else if (stepStatus == index) {
+    //     stepList[index].status = 'process';
+    //   } else if(index > stepStatus) {
+    //     stepList[index].status = 'wait';
+    //   }
+    // }
+      let iname = {"name" :"t33336553"};
+      let categorys;
+      axios.post(process.env.VUE_APP_SERVER + "/game/create",iname).then(res=>{
+        const data = res.data;
+        if (data.success) {
+          categorys = data.content;
+          console.log("原始数据：", categorys);
+        }
+      })
+    });
+
+  },
+
+
 });
+
+
 </script>
+
+<style scoped>
+  .target {
+    font-size: 20px;
+    /* border-bottom: 1px solid; */
+    text-decoration:underline;
+  }
+  .ant-input-affix-wrapper {
+    width:15%
+  }
+  .components-create .ant-input {
+    width: 200px;
+    margin: 8px 8px 8px 0;
+ 
+  }
+  .components-update {
+    margin-top: 20px;
+    margin: 8px 8px 8px 0;
+ 
+  }
+
+  .components-input  {
+    margin-right: 50px ;
+ 
+  }
+  .ant-descriptions-item-content {
+    color: #f5222d !important;
+  }
+
+  #components-next .ant-btn-group {
+   margin-right: 8px;
+   margin-top: 200px;
+  }
+</style>
