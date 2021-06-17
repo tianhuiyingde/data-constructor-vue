@@ -15,7 +15,7 @@
 
   <div class="components-update" v-if="stepStatus == 1" data-sourse="game">
     <div style="color: red;font-size: 20px;margin-top: 10px;">请进入以下地址编辑互动题内容并保存。</div>
-    <a class="target" target="_blank" href="https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95">
+    <a class="target" target="_blank" href="{{editorUrl}}">
       https://webeditor.aixuexi.com/#/editor?parentId=0&id=1538&name=thy%E6%B5%8B%E8%AF%95</a> 
       <router-link :to="'/doc?ebookId=' + item.id">
         {{ game }}
@@ -83,7 +83,8 @@ export default defineComponent({
         {status: 'process', title: 'Step 1',description: '创建互动题'},
         {status: 'wait', title: 'Step 2',description: '编辑互动题'},
         {status: 'wait', title: 'Step 3',description: '发布'},
-      ]
+      ],
+      editorUrl:''
     });
 
     onMounted(() => {
@@ -98,6 +99,7 @@ export default defineComponent({
         if (data.success) {
           categorys = data.content;
           console.log("原始数据：", categorys);
+          data.editorUrl = categorys.editorUrl
         }
       })
     };
