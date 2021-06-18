@@ -15,7 +15,7 @@
 
   <div class="components-update" v-if="stepStatus == 1" :data-sourse="data">
     <div style="color: red;font-size: 20px;margin-top: 10px;">请进入以下地址编辑互动题内容并保存。</div>
-    <a class="target" target="_blank" href={{data.editorUrl}}>
+    <a class="target" target="_blank" :href=editorUrl>
       {{editorUrl}}</a> 
 
     </div>
@@ -92,10 +92,10 @@ export default defineComponent({
     const created = (): void => {
       let iname = {"name" :"t33336553"};
       axios.post(process.env.VUE_APP_SERVER + "/game/create",iname).then((res: any) => {
-        let data = res.data;
+        let game = res.data;
         console.log("data",data);
-        if (data.success) {
-          data.editorUrl = data.data.editorUrl;
+        if (game.success) {
+          data.editorUrl = game.data.editorUrl;
           console.log("editorUrl",data.editorUrl);
         }
       })
