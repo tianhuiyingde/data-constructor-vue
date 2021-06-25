@@ -1,22 +1,22 @@
 <template>
 
   <div class="home">
-    <a-steps type="navigation" :style="stepStyle">
+    <a-steps v-model="current" type="navigation" :style="stepStyle" >
       <a-step v-for="(item, index) in stepList" :key = "index" :status="item.status" :title="item.title" :description="item.description"/>
     </a-steps>
   </div>
 
   <div class="components-create" v-if="stepStatus == 0">
     <a-input class="components-input" maxLength = 10 size="large" placeholder="请输入互动题名称" allow-clear @change="onChange" />
-    <a-button type="primary" :size="size" @click="nextStep(1)">
+    <a-button type="primary" :size="size" @click="nextStep1">
       创建
     </a-button>
   </div>
 
   <div class="components-update" v-if="stepStatus == 1" :data-sourse="data">
-    <div style="color: red;font-size: 20px;margin-top: 10px;">请进入以下地址编辑互动题内容并保存。</div>
-    <a class="target" target="_blank" :href=editorUrl>
-      {{editorUrl}}</a> 
+    <div style="color: red;font-size: 20px;margin-top: 10px;">创建成功！请进入以下地址编辑互动题内容并保存。</div>
+    <a class="target" target="_blank" :href=editorUrl >
+      互动题名称：{{gameName}}</a> 
 
     </div>
 
@@ -45,14 +45,22 @@
       </a-select-option>
     </a-select>
 
-    <a-button type="primary" :size="size">
+    <a-button type="primary" :size="size" @click="nextStep3">
       发布
     </a-button>
   </div>
 
-  <div id='components-next' style ='opacity: 0'>
+  <div class="publish-success" v-if="stepStatus == 3" :data-sourse="data">
+    <div style="color: red;font-size: 20px;margin-top: 10px;">互动题发布成功!去查看</div>
+    <a class="target" target="_blank" :href=gameUrl >
+      互动题名称：{{gameName}}</a> 
+
+    </div>
+
+  <div id='components-next' v-if="stepStatus == 1">
     <a-button-group>
-      <a-button type="primary" > 下一步<a-icon type="right" /> </a-button>
+      <div style="margin-right:10px ">互动题编辑完成，请点击</div>
+      <a-button type="primary" @click="nextStep2"> 下一步<a-icon type="right" /> </a-button>
     </a-button-group>
   </div>
 
@@ -74,7 +82,7 @@ export default defineComponent({
     let data = reactive({
       stepStatus: 0,
       stepStyle: {
-        marginBottom: '60px',
+        marginBottom: '120px',
         boxShadow: '0px -1px 0 0 #e8e8e8 inset',
       },
       stepList: [
@@ -82,12 +90,15 @@ export default defineComponent({
         {status: 'wait', title: 'Step 2',description: '编辑互动题'},
         {status: 'wait', title: 'Step 3',description: '发布'},
       ],
-      editorUrl:''
+      editorUrl:'',
+      gameUrl:'',
+      gameName:"1"
     });
 
-    onMounted(() => {
-      tipsHandler();
-    });
+    // onMounted(() => {
+
+    // });
+
 
     const created = (): void => {
       let iname = {"name" :"t33336553"};
@@ -101,32 +112,44 @@ export default defineComponent({
       })
     };
 
-    const tipsHandler = (): void => {
-      let stepList: Array<any> = data.stepList;
-      let stepStatus: number = data.stepStatus;
-      let index: number;
-      for( index = 0; index < stepList.length; index ++) {
-        let item = stepList[index] as any;
-        if(index < stepStatus) {
-          item.status = 'finish';
-        } else if (stepStatus == index) {
-          item.status = 'process';
-        } else if(index > stepStatus) {
-          item.status = 'wait';
+    const published = (): void => {
+      let req = {"subject" :"1","schoolsection" :"1"};
+      axios.post(process.env.VUE_APP_SERVER + "/game/publish",req).then((res: any) => {
+        let game1 = res.data;
+        console.log("data",data);
+        if (game1.success) {
+          data.gameUrl = game1.data.gameUrl;
         }
-      }
+      })
     };
 
-    const nextStep = (ids: any) => {
+    const nextStep1 = ():void =>{
+      let stepList: Array<any> = data.stepList;
       created();
-      console.log(ids, '--ids--');
-      data.stepStatus = ids;
-      tipsHandler();
+      stepList[0].status = 'finish';
+      stepList[1].status = 'process';
+      data.stepStatus = 1;
+    }
+    
+    const nextStep2 = ():void =>{
+      let stepList: Array<any> = data.stepList;
+      stepList[1].status = 'finish';
+      stepList[2].status = 'process';
+      data.stepStatus = 2;
+    }
+
+    const nextStep3 = ():void =>{
+      published();
+      let stepList: Array<any> = data.stepList;
+      stepList[2].status = 'finish';
+      data.stepStatus = 3;
     }
     
     return {
       ...toRefs(data),
-      nextStep
+      nextStep1,
+      nextStep2,
+      nextStep3
     }
 
   },
@@ -137,6 +160,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
 
   .target {
     font-size: 20px;
