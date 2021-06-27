@@ -15,9 +15,9 @@
   <div v-if="stepStatus == 4">
     <a-spin size="large" />
   </div>
-  <div class="components-update" v-if="stepStatus == 1" :data-sourse="data">
+  <div class="components-update" v-if="stepStatus == 1 || stepStatus == 5" :data-sourse="data">
     <div style="color: red;font-size: 20px;margin-top: 10px;">创建成功！请进入以下地址编辑互动题内容并保存。</div>
-    <a class="target" target="_blank" :href=editorUrl >
+    <a class="target" target="_blank" :href=editorUrl @click="nextStep4">
       互动题名称：{{inputVal}}</a> 
 
     </div>
@@ -60,7 +60,7 @@
 
     </div>
 
-  <div id='components-next' v-if="stepStatus == 1">
+  <div id='components-next' v-if="stepStatus == 5">
     <a-button-group>
       <div style="margin-right:10px ">互动题编辑完成，请点击</div>
       <a-button type="primary" @click="nextStep2"> 下一步<a-icon type="right" /> </a-button>
@@ -166,12 +166,16 @@ export default defineComponent({
       published();
       
     }
-    
+    const nextStep4 = ():void =>{
+      data.stepStatus = 5;      
+    }
+
     return {
       ...toRefs(data),
       nextStep1,
       nextStep2,
       nextStep3,
+      nextStep4,
       onChange,
       handleChangeSubject,
       handleChangeSchoolSection
@@ -219,6 +223,6 @@ export default defineComponent({
 
   #components-next .ant-btn-group {
    margin-right: 8px;
-   margin-top: 200px;
+   margin-top: 100px;
   }
 </style>
