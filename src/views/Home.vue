@@ -1,7 +1,7 @@
 <template>
 
   <div class="home">
-    <a-steps v-model="current" type="navigation" :style="stepStyle" >
+    <a-steps :current="current" type="navigation" :style="stepStyle" >
       <a-step v-for="(item, index) in stepList" :key = "index" :status="item.status" :title="item.title" :description="item.description"/>
     </a-steps>
   </div>
@@ -83,6 +83,7 @@ export default defineComponent({
   setup() {
 
     let data = reactive({
+      current: 0,
       stepStatus: 0,
       stepStyle: {
         marginBottom: '120px',
@@ -150,8 +151,11 @@ export default defineComponent({
 
     const nextStep1 = ():void =>{
       data.stepStatus = 4;
-      created();
-      
+      // created();
+      let stepList: Array<any> = data.stepList;
+      data.current = 1;
+      stepList[0].status = 'finish';
+      stepList[1].status = 'process';
     }
     
     const nextStep2 = ():void =>{
@@ -182,8 +186,6 @@ export default defineComponent({
     }
 
   },
-
- 
 
 });
 </script>
