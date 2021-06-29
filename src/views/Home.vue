@@ -7,7 +7,20 @@
   </div>
 
   <div class="components-create" v-if="stepStatus == 0">
+    <span>互动题名称：</span>
     <a-input  class="components-input" maxLength = 10 size="large" placeholder="请输入互动题名称" allow-clear @change="onChange" />
+    <span>是否使用模版：</span>
+    <a-select default-value="0" :size="large"  style="width: 150px;margin-right: 20px;"  @change="handleChangeTemplate" >
+      <a-select-option value="0">
+        否
+      </a-select-option>
+      <a-select-option value="392">
+        选择题模版
+      </a-select-option>
+      <a-select-option value="1255">
+        拖拽填空题模版
+      </a-select-option>
+    </a-select>
     <a-button type="primary" :size="size" @click="nextStep1">
       创建
     </a-button>
@@ -24,27 +37,15 @@
 
   <div class="components-publish" v-if="stepStatus == 2">
     <span>学段：</span>
-    <a-select default-value="1" :size="large"  style="width: 150px;margin-right: 20px;" placeholder="请选择学段" @change="handleChangeSubject" >
-      <a-select-option value="1">
-        小学
-      </a-select-option>
-      <a-select-option value="2">
-        初中
-      </a-select-option>
-      <a-select-option value="3" >
-        高中
+    <a-select :default-value="sectionList[0].value" :size="large"  style="width: 150px;margin-right: 20px;" placeholder="请选择学段" @change="handleChangeSchoolSection" >
+      <a-select-option v-for="(item, index) in sectionList" :key = "index" :value="item.value">
+        {{ item.label }}
       </a-select-option>
     </a-select>
     <span>学科：</span>
-    <a-select default-value="1"  :size="large"  style="width: 150px;margin-right: 50px;" placeholder="请选择学科" @change="handleChangeSchoolSection" >
-      <a-select-option value="1">
-        语文
-      </a-select-option>
-      <a-select-option value="2">
-        英语
-      </a-select-option>
-      <a-select-option value="3" >
-        数学
+    <a-select :default-value="subjectList[0].value"  :size="large"  style="width: 150px;margin-right: 50px;" placeholder="请选择学科" @change="handleChangeSubject" >
+      <a-select-option v-for="(item, index) in subjectList" :key = "index" :value="item.value">
+        {{ item.label }}
       </a-select-option>
     </a-select>
 
@@ -94,11 +95,27 @@ export default defineComponent({
         {status: 'wait', title: 'Step 2',description: '编辑互动题'},
         {status: 'wait', title: 'Step 3',description: '发布'},
       ],
+      sectionList:[
+        {value: 1, label: "小学"},
+        {value: 2, label: "初中"},
+        {value: 3, label: "高中"},
+      ],
+      subjectList:[                            
+        {value: 1, label: "语文"},
+        {value: 2, label: "数学"},
+        {value: 3, label: "英文"},
+        {value: 4, label: "物理"},
+        {value: 5, label: "化学"},
+        {value: 6, label: "生物"},
+        {value: 7, label: "历史"},
+        {value: 8, label: "政治"},
+      ],
       editorUrl:'',
       gameUrl:'',
       inputVal:'默认新互动题',
       subjectVal:1,
-      schoolsectionVal:1
+      schoolsectionVal:1,
+      templateVal:0
     });
 
     // onMounted(() => {
@@ -117,9 +134,13 @@ export default defineComponent({
       data.schoolsectionVal=value;
       console.log(`selected ${value}`);
     }
+    const handleChangeTemplate = (value: any) =>{
+      data.templateVal=value;
+      console.log(`selected ${value}`);
+    }
 
     const created = (): void => {
-      let iname = {"name" :data.inputVal};
+      let iname = {"name" :data.inputVal,"templateId":data.templateVal};
       axios.post(process.env.VUE_APP_SERVER + "/game/create",iname).then((res: any) => {
         let game = res.data;
         console.log("data",data);
@@ -128,6 +149,7 @@ export default defineComponent({
           data.editorUrl = game.data.editorUrl;
           console.log("editorUrl",data.editorUrl);
           data.stepStatus = 1;
+          data.current = 1;
           stepList[0].status = 'finish';
           stepList[1].status = 'process';
         }
@@ -151,15 +173,12 @@ export default defineComponent({
 
     const nextStep1 = ():void =>{
       data.stepStatus = 4;
-      // created();
-      let stepList: Array<any> = data.stepList;
-      data.current = 1;
-      stepList[0].status = 'finish';
-      stepList[1].status = 'process';
+      created();
     }
     
     const nextStep2 = ():void =>{
       let stepList: Array<any> = data.stepList;
+      data.current = 2;
       stepList[1].status = 'finish';
       stepList[2].status = 'process';
       data.stepStatus = 2;
@@ -182,7 +201,8 @@ export default defineComponent({
       nextStep4,
       onChange,
       handleChangeSubject,
-      handleChangeSchoolSection
+      handleChangeSchoolSection,
+      handleChangeTemplate
     }
 
   },
@@ -203,7 +223,7 @@ export default defineComponent({
   }
 
   .components-create .ant-input {
-    width: 200px;
+    width: 100px;
     margin: 8px 8px 8px 0;
  
   }
@@ -215,7 +235,8 @@ export default defineComponent({
   }
 
   .components-input  {
-    margin-right: 50px ;
+    margin-right: 30px ;
+    width: 200px;
  
   }
 
